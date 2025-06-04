@@ -1,39 +1,23 @@
 import request from '@/utils/request'
 
-export function getOwnerPage(params) {
-  return request({
-    url: '/api/owner/page',
-    method: 'get',
-    params
-  })
-}
+// ... 其他方法保持不变 ...
 
-export function getOwnerDetail(id) {
+export function importOwner(data) {
   return request({
-    url: `/api/owner/${id}`,
-    method: 'get'
-  })
-}
-
-export function createOwner(data) {
-  return request({
-    url: '/api/owner',
+    url: '/api/owner/import',
     method: 'post',
-    data
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 
-export function updateOwner(data) {
+export function exportOwner(params) {
   return request({
-    url: '/api/owner',
-    method: 'put',
-    data
-  })
-}
-
-export function deleteOwner(id) {
-  return request({
-    url: `/api/owner/${id}`,
-    method: 'delete'
+    url: '/api/owner/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
   })
 }
