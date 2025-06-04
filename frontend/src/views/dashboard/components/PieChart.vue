@@ -1,24 +1,20 @@
 <template>
-  <div ref="chartRef" :style="{ height: height, width: width }" />
+  <div ref="chartRef" :style="{ height, width: '100%' }" />
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineProps, watch } from 'vue'
 import * as echarts from 'echarts'
-import { useResizeHandler } from '@/hooks/useResizeHandler'
+import { useResizeHandler } from '../hooks/useResizeHandler'
 
 const props = defineProps({
-  width: {
-    type: String,
-    default: '100%'
+  data: {
+    type: Array,
+    default: () => []
   },
   height: {
     type: String,
     default: '350px'
-  },
-  chartData: {
-    type: Object,
-    required: true
   }
 })
 
@@ -28,70 +24,56 @@ let chart = null
 // 初始化图表
 const initChart = () => {
   if (!chartRef.value) return
-  
-  chart = echarts.init(chartRef.value)
-  setOptions(props.chartData)
-}
 
-// 设置图表配置
-const setOptions = (data) => {
-  if (!chart) return
-  
-  chart.setOption({
+  chart = echarts.init(chartRef.value)
+  const option = {
     tooltip: {
       trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
+      formatter: '{b}: ¥{c} ({d}%)'
     },
     legend: {
       orient: 'vertical',
-      left: 10,
-      data: data.legend
+      left: 'left'
     },
     series: [
       {
-        name: '收入构成',
+        name: '收入占比',
         type: 'pie',
-        radius: ['50%', '70%'],
-        avoidLabelOverlap: false,
-        label: {
-          show: false,
-          position: 'center'
-        },
+        radius: '70%',
+        center: ['60%', '50%'],
+        data: props.data.map(item => ({
+          name: item.name,
+          value: item.value
+        })),
         emphasis: {
-          label: {
-            show: true,
-            fontSize: '30',
-            fontWeight: 'bold'
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
-        },
-        labelLine: {
-          show: false
-        },
-        data: data.series
+        }
       }
     ]
-  })
+  }
+
+  chart.setOption(option)
 }
 
 // 监听数据变化
 watch(
-  () => props.chartData,
-  (val) => {
-    setOptions(val)
+  () => props.data,
+  () => {
+    initChart()
   },
   { deep: true }
 )
 
 // 处理窗口大小变化
-const { addResizeListener, removeResizeListener } = useResizeHandler()
+const { addResizeListener, removeResizeListener } = useResizeHandler(chart)
 
 onMounted(() => {
   initChart()
-  addResizeListener(chartRef.value, () => {
-    if (chart) {
-      chart.resize()
-    }
-  })
+  addResizeListener()
 })
 
 onBeforeUnmount(() => {
@@ -99,6 +81,6 @@ onBeforeUnmount(() => {
     chart.dispose()
     chart = null
   }
-  removeResizeListener(chartRef.value)
+  removeResizeListener()
 })
 </script>

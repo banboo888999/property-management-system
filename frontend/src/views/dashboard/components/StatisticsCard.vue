@@ -6,7 +6,7 @@
           <component :is="icon" />
         </el-icon>
       </div>
-      <div class="info-wrapper">
+      <div class="info">
         <div class="title">{{ title }}</div>
         <div class="value">{{ value }}</div>
       </div>
@@ -15,13 +15,15 @@
 </template>
 
 <script setup>
+import { defineProps } from 'vue'
+
 defineProps({
   title: {
     type: String,
     required: true
   },
   value: {
-    type: String,
+    type: [String, Number],
     required: true
   },
   icon: {
@@ -42,16 +44,16 @@ defineProps({
     align-items: center;
 
     .icon-wrapper {
-      width: 80px;
-      height: 80px;
+      width: 48px;
+      height: 48px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 20px;
+      margin-right: 16px;
     }
 
-    .info-wrapper {
+    .info {
       flex: 1;
 
       .title {
